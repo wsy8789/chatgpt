@@ -1,28 +1,25 @@
-from flask import Flask, request, jsonify
 import openai
 import os
 
-app = Flask(__name__)
+# 设置 OpenAI API 密钥
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-model_api_key = os.environ.get('OPENAI_API_KEY')
-
-openai.api_key = model_api_key
-model_engine = "davinci"
-
-@app.route('/', methods=['POST'])
-def chat():
-    content = request.json['content']
-
+# 发送消息给 ChatGPT，获取回复
+def send_message_to_chatgpt(message):
     response = openai.Completion.create(
-        engine=model_engine,
-        prompt=content,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.5,
+      engine="davinci",
+      prompt=message,
+      max_tokens=1024,
+      n=1,
+      stop=None,
+      temperature=0.7,
     )
 
-    return jsonify({'content': response.choices[0].text.strip()})
+    message = response.choices[0].text.strip()
+    return message
 
-if __name__ == '__main__':
-    app.run()
+# 测试函数
+if __name__ == "__main__":
+    message = "你好，聊天机器人"
+    reply = send_message_to_chatgpt(message)
+    print(reply)
